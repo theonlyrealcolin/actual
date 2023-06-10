@@ -1644,7 +1644,13 @@ export let TransactionTable = forwardRef((props, ref) => {
         let transactions = latestState.current.transactions;
         let idx = transactions.findIndex(t => t.id === id);
         let parent = transactionMap.get(transactions[idx]?.parent_id);
-
+        //Check if the remaining balance is being entered, if so then don't create a new split.
+        if (parent?.error?.difference === transactions[idx].amount) {
+          const sum = latestState.current.transactions
+            .filter(transaction => transaction.parent_id === parent.id)
+            .reduce((acc, transaction) => acc + transaction.amount, 0);
+          if (sum === parent.amount) return;
+        }
         if (
           isLastChild(transactions, idx) &&
           parent &&
