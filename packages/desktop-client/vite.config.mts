@@ -171,7 +171,7 @@ const lootCoreBackend = (): Plugin => ({
         'development',
         '--watch',
       ],
-      { cwd: lootCoreRoot, stdio: 'inherit' },
+      { cwd: lootCoreRoot, stdio: 'inherit', shell: true },
     );
     child.on('error', err => {
       server.config.logger.error(
