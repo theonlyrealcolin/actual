@@ -6,6 +6,7 @@ import { SvgDotsHorizontalTriple } from '@actual-app/components/icons/v1';
 import {
   SvgArrowButtonDown1,
   SvgArrowButtonUp1,
+  SvgCalendar3,
 } from '@actual-app/components/icons/v2';
 import { Popover } from '@actual-app/components/popover';
 import { styles } from '@actual-app/components/styles';
@@ -15,6 +16,7 @@ import * as monthUtils from '@actual-app/core/shared/months';
 import { css } from '@emotion/css';
 
 import { useEnvelopeBudget } from '#components/budget/envelope/EnvelopeBudgetContext';
+import { useScheduledTransactions } from '#components/budget/ScheduledTransactionsContext';
 import { NotesButton } from '#components/NotesButton';
 import { useLocale } from '#hooks/useLocale';
 import { SheetNameProvider } from '#hooks/useSheetName';
@@ -35,6 +37,8 @@ export const BudgetSummary = memo(({ month }: BudgetSummaryProps) => {
     onBudgetAction,
     onToggleSummaryCollapse,
   } = useEnvelopeBudget();
+
+  const { showScheduled, setShowScheduled } = useScheduledTransactions();
 
   const [menuOpen, setMenuOpen] = useState(false);
   const triggerRef = useRef(null);
@@ -154,7 +158,23 @@ export const BudgetSummary = memo(({ month }: BudgetSummaryProps) => {
                 defaultColor={theme.pageTextLight}
               />
             </View>
-            <View style={{ userSelect: 'none', marginLeft: 2 }}>
+            <View
+              title={t('Include scheduled transactions')}
+              style={{ marginLeft: 6 }}
+            >
+              <Button
+                variant="bare"
+                aria-label={t('Include scheduled transactions')}
+                onPress={() => setShowScheduled(!showScheduled)}
+                style={{
+                  color: showScheduled ? '#a855f7' : theme.pageTextLight,
+                  padding: 2,
+                }}
+              >
+                <SvgCalendar3 width={15} height={15} />
+              </Button>
+            </View>
+            <View style={{ userSelect: 'none', marginLeft: 6 }}>
               <Button
                 ref={triggerRef}
                 variant="bare"

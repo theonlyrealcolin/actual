@@ -6,6 +6,7 @@ import { styles } from '@actual-app/components/styles';
 import { View } from '@actual-app/components/view';
 import { send } from '@actual-app/core/platform/client/connection';
 import * as monthUtils from '@actual-app/core/shared/months';
+import { q } from '@actual-app/core/shared/query';
 import type {
   CategoryEntity,
   CategoryGroupEntity,
@@ -28,10 +29,12 @@ import { useNavigate } from '#hooks/useNavigate';
 import { SheetNameProvider } from '#hooks/useSheetName';
 import { useSpreadsheet } from '#hooks/useSpreadsheet';
 import { useSyncedPref } from '#hooks/useSyncedPref';
+import { SchedulesProvider } from '#hooks/useCachedSchedules';
 
 import { AutoSizingBudgetTable } from './DynamicBudgetTable';
 import * as envelopeBudget from './envelope/EnvelopeBudgetComponents';
 import { EnvelopeBudgetProvider } from './envelope/EnvelopeBudgetContext';
+import { ScheduledTransactionsProvider } from './ScheduledTransactionsContext';
 import * as trackingBudget from './tracking/TrackingBudgetComponents';
 import { TrackingBudgetProvider } from './tracking/TrackingBudgetContext';
 import { prewarmAllMonths, prewarmMonth } from './util';
@@ -40,6 +43,7 @@ export function Budget() {
   const currentMonth = monthUtils.currentMonth();
   const spreadsheet = useSpreadsheet();
   const navigate = useNavigate();
+  const schedulesQuery = useMemo(() => q('schedules').select('*'), []);
   const [summaryCollapsed, setSummaryCollapsedPref] = useLocalPref(
     'budget.summaryCollapsed',
   );
@@ -241,24 +245,28 @@ export function Budget() {
   }
 
   return (
-    <SheetNameProvider name={monthUtils.sheetForMonth(startMonth)}>
-      {/*
-        In a previous iteration, the wrapper needs `overflow: hidden` for
-        some reason. Without it at certain dimensions the width/height
-        that autosizer gives us is slightly wrong, causing scrollbars to
-        appear. We might not need it anymore?
-      */}
-      <View
-        style={{
-          ...styles.page,
-          paddingLeft: 8,
-          paddingRight: 8,
-          overflow: 'hidden',
-        }}
-      >
-        <View style={{ flex: 1 }}>{table}</View>
-      </View>
-    </SheetNameProvider>
+    <SchedulesProvider query={schedulesQuery}>
+      <ScheduledTransactionsProvider>
+        <SheetNameProvider name={monthUtils.sheetForMonth(startMonth)}>
+          {/*
+            In a previous iteration, the wrapper needs `overflow: hidden` for
+            some reason. Without it at certain dimensions the width/height
+            that autosizer gives us is slightly wrong, causing scrollbars to
+            appear. We might not need it anymore?
+          */}
+          <View
+            style={{
+              ...styles.page,
+              paddingLeft: 8,
+              paddingRight: 8,
+              overflow: 'hidden',
+            }}
+          >
+            <View style={{ flex: 1 }}>{table}</View>
+          </View>
+        </SheetNameProvider>
+      </ScheduledTransactionsProvider>
+    </SchedulesProvider>
   );
 }
 

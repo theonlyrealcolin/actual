@@ -104,6 +104,7 @@ export type LocalPrefs = Partial<{
   reportsViewSummary: boolean;
   reportsViewLabel: boolean;
   sidebarWidth: number;
+  'budget.showScheduledTransactions': boolean;
   'mobile.showSpentColumn': boolean;
   'mobile.bankSyncProvidersCollapsed': boolean;
 }>;
